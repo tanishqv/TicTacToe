@@ -27,6 +27,28 @@ public class Game {
         this.winningStrategies = winningStrategies;
     }
 
+    public void makeMove() {
+        Player currentPlayer = players.get(nextPlayerMoveId);
+        Move move = currentPlayer.makeMove(board);
+        System.out.println(currentPlayer.getName() + " wants to make a move at " + move.getCell().toString());
+
+        int row = move.getCell().getxPos();
+        int col = move.getCell().getyPos();
+
+        Cell cellToUpdate = board.getGrid().get(row).get(col);
+        cellToUpdate.setPlayer(currentPlayer);
+        cellToUpdate.setCellStatus(CellStatus.OCCUPIED);
+
+        Move finalMove = new Move(cellToUpdate, currentPlayer);
+        moves.add(finalMove);
+
+        nextPlayerMoveId = (nextPlayerMoveId + 1) % players.size();
+    }
+
+    public void display() {
+        board.printGrid();
+    }
+
     public static class Builder {
         private int dimension;
         private int nextPlayerMoveId;

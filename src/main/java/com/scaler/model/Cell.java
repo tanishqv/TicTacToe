@@ -6,10 +6,18 @@ public class Cell {
     private CellStatus cellStatus;
     private Player player;
 
-    public Cell(CellStatus cellStatus, int yPos, int xPos) {
-        this.cellStatus = cellStatus;
-        this.yPos = yPos;
+    public Cell(int xPos, int yPos, CellStatus cellStatus) {
         this.xPos = xPos;
+        this.yPos = yPos;
+        this.cellStatus = cellStatus;
+    }
+
+    public void printCell() {
+        if (cellStatus.equals(CellStatus.EMPTY)) {
+            System.out.print("| |");
+        } else {
+            System.out.print("|" + player.getSymbol().getSign() + "|");
+        }
     }
 
     public int getxPos() {
@@ -42,5 +50,13 @@ public class Cell {
 
     public void setPlayer(Player player) {
         this.player = player;
+    }
+
+    @Override
+    public String toString() {
+        return "Cell{" +
+                "yPos=" + yPos +
+                ", xPos=" + xPos +
+                '}';
     }
 }

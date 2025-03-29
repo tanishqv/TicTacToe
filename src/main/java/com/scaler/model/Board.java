@@ -18,6 +18,19 @@ public class Board {
         }
     }
 
+    public boolean validateMove(int row, int col) {
+        return grid.get(row).get(col).getCellStatus().equals(CellStatus.EMPTY);
+    }
+
+    public void printGrid() {
+        for (List<Cell> row: grid) {
+            for (Cell cell: row) {
+                cell.printCell();
+            }
+            System.out.println();
+        }
+    }
+
     public List<List<Cell>> getGrid() {
         return grid;
     }
