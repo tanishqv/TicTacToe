@@ -15,24 +15,42 @@ public class RowWinningStrategy implements WinningStrategy {
 
     public RowWinningStrategy(int dimension) {
         this.dimension = dimension;
-
         allRowMaps = new ArrayList<>();
         for (int i=0; i<dimension; i++) {
             allRowMaps.add(new HashMap<>());
         }
     }
 
-    public boolean checkWinner(Board board, Move move) {
+    public void handleNewMove(Board board, Move move) {
         int row = move.getCell().getxPos();
         Symbol symbol = move.getPlayer().getSymbol();
 
         Map<Symbol, Integer> rowMap = allRowMaps.get(row);
-        // check current col
+        // check current row
         if (rowMap.containsKey(symbol)) {
             rowMap.put(symbol, rowMap.get(symbol) + 1);
         } else {
             rowMap.put(symbol, 1);
         }
-        return rowMap.get(symbol) != dimension;
+    }
+
+    public boolean checkWinner(Board board, Move move) {
+        int row = move.getCell().getxPos();
+        Symbol symbol = move.getPlayer().getSymbol();
+        Map<Symbol, Integer> rowMap = allRowMaps.get(row);
+
+        if (rowMap.get(symbol) == dimension) {
+            System.out.println("Winner declared through row " + row);
+            return true;
+        }
+        return false;
+    }
+
+    public void handleUndo(Board board, Move move) {
+        int row = move.getCell().getxPos();
+        Symbol symbol = move.getPlayer().getSymbol();
+
+        Map<Symbol, Integer> rowMap = allRowMaps.get(row);
+        rowMap.put(symbol, rowMap.get(symbol) - 1);
     }
 }

@@ -1,6 +1,5 @@
 package com.scaler.strategy.winningstrategy;
 
-import com.scaler.exception.InvalidDimensionException;
 import com.scaler.model.Board;
 import com.scaler.model.Move;
 import com.scaler.model.Symbol;
@@ -12,36 +11,12 @@ public class DiagonalWinningStrategy implements WinningStrategy {
     private Map<Symbol, Integer> leftDiagonal;
     private Map<Symbol, Integer> rightDiagonal;
 
-    private DiagonalWinningStrategy() {
+    public DiagonalWinningStrategy() {
         leftDiagonal = new HashMap<>();
         rightDiagonal = new HashMap<>();
     }
-    public static class Builder {
-        private int dimension;
 
-        private boolean validateDimension() throws InvalidDimensionException{
-            if (this.dimension % 2 != 0) {
-                return true;
-            }
-            throw new InvalidDimensionException("Cannot introduce diagonal winning strategy for even sized boards");
-        }
-
-        public static Builder getBuilder() {
-            return new Builder();
-        }
-
-        public Builder setDimension(int dimension) throws InvalidDimensionException {
-            this.dimension = dimension;
-            validateDimension();
-            return this;
-        }
-
-        public DiagonalWinningStrategy build() {
-            return new DiagonalWinningStrategy();
-        }
-    }
-
-    public boolean checkWinner(Board board, Move move) {
+    public void handleNewMove(Board board, Move move) {
         int row = move.getCell().getxPos();
         int col = move.getCell().getyPos();
         Symbol symbol = move.getPlayer().getSymbol();
@@ -53,10 +28,6 @@ public class DiagonalWinningStrategy implements WinningStrategy {
             } else {
                 leftDiagonal.put(symbol, 1);
             }
-
-            if (leftDiagonal.get(symbol) == board.getDimension()) {
-                return true;
-            }
         }
         // right diagonal
         if (row + col == board.getDimension() - 1) {
@@ -65,11 +36,43 @@ public class DiagonalWinningStrategy implements WinningStrategy {
             } else {
                 rightDiagonal.put(symbol, 1);
             }
+        }
+    }
 
+    public boolean checkWinner(Board board, Move move) {
+        int row = move.getCell().getxPos();
+        int col = move.getCell().getyPos();
+        Symbol symbol = move.getPlayer().getSymbol();
+
+        // left diagonal
+        if (row == col) {
+            if (leftDiagonal.get(symbol) == board.getDimension()) {
+                System.out.println("Winner declared through left diagonal");
+                return true;
+            }
+        }
+        // right diagonal
+        if (row + col == board.getDimension() - 1) {
             if (rightDiagonal.get(symbol) == board.getDimension()) {
+                System.out.println("Winner declared through right diagonal");
                 return true;
             }
         }
         return false;
+    }
+
+    public void handleUndo(Board board, Move move) {
+        int row = move.getCell().getxPos();
+        int col = move.getCell().getyPos();
+        Symbol symbol = move.getPlayer().getSymbol();
+
+        // left diagonal
+        if (row == col) {
+            leftDiagonal.put(symbol, leftDiagonal.get(symbol) - 1);
+        }
+        // right diagonal
+        if (row + col == board.getDimension() - 1) {
+            rightDiagonal.put(symbol, rightDiagonal.get(symbol) - 1);
+        }
     }
 }

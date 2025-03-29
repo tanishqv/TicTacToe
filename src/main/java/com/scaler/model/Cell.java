@@ -55,8 +55,8 @@ public class Cell {
     @Override
     public String toString() {
         return "Cell{" +
-                "yPos=" + yPos +
-                ", xPos=" + xPos +
+                "xPos=" + xPos +
+                ", yPos=" + yPos +
                 '}';
     }
 }

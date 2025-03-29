@@ -24,4 +24,9 @@ public class Symbol {
     public void setImagePath(String imagePath) {
         this.imagePath = imagePath;
     }
+
+    @Override
+    public String toString() {
+        return "" + sign;
+    }
 }

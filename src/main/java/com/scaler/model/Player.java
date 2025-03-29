@@ -19,9 +19,9 @@ public class Player {
     }
 
     public Move makeMove(Board board) throws InvalidMoveException {
-        System.out.println("Enter row number (0-indexed): ");
+        System.out.print("Enter row number (0-indexed): ");
         int row = scn.nextInt();
-        System.out.println("Enter col number (0-indexed): ");
+        System.out.print("Enter col number (0-indexed): ");
         int col = scn.nextInt();
 
         if (board.validateMove(row, col)) {
@@ -68,7 +68,7 @@ public class Player {
                 "id=" + id +
                 ", name='" + name + '\'' +
                 ", playerType=" + playerType +
-                ", symbol=" + symbol +
+                ", symbol=" + symbol.toString() +
                 '}';
     }
 }

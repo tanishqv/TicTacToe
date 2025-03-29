@@ -14,13 +14,14 @@ public class ColumnWinningStrategy implements WinningStrategy {
     private List<Map<Symbol, Integer>> allColumnMaps;
 
     public ColumnWinningStrategy(int dimension) {
+        this.dimension = dimension;
         allColumnMaps = new ArrayList<>();
         for (int i=0; i<dimension; i++) {
             allColumnMaps.add(new HashMap<>());
         }
     }
 
-    public boolean checkWinner(Board board, Move move) {
+    public void handleNewMove(Board board, Move move) {
         int col = move.getCell().getyPos();
         Symbol symbol = move.getPlayer().getSymbol();
 
@@ -31,6 +32,26 @@ public class ColumnWinningStrategy implements WinningStrategy {
         } else {
             columnMap.put(symbol, 1);
         }
-        return columnMap.get(symbol) != dimension;
+    }
+
+
+    public boolean checkWinner(Board board, Move move) {
+        int col = move.getCell().getyPos();
+        Symbol symbol = move.getPlayer().getSymbol();
+
+        Map<Symbol, Integer> columnMap = allColumnMaps.get(col);
+        if (columnMap.get(symbol) == dimension) {
+            System.out.println("Winner declared through column " + col);
+            return true;
+        }
+        return false;
+    }
+
+    public void handleUndo(Board board, Move move) {
+        int col = move.getCell().getyPos();
+        Symbol symbol = move.getPlayer().getSymbol();
+
+        Map<Symbol, Integer> columnMap = allColumnMaps.get(col);
+        columnMap.put(symbol, columnMap.get(symbol) - 1);
     }
 }

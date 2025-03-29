@@ -1,11 +1,9 @@
 package com.scaler.model;
 
-import com.scaler.exception.DuplicateSymbolException;
-import com.scaler.exception.InvalidBotCountException;
-import com.scaler.exception.InvalidPlayerCountException;
-import com.scaler.exception.SymbolNotAssignedException;
+import com.scaler.exception.*;
 import com.scaler.strategy.winningstrategy.WinningStrategy;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -22,15 +20,19 @@ public class Game {
 
     private Game(int dimension, List<Player> players, int nextPlayerMoveId, List<WinningStrategy> winningStrategies) {
         this.dimension = dimension;
+        this.board = new Board(dimension);
+        this.moves = new ArrayList<>();
         this.players = players;
         this.nextPlayerMoveId = nextPlayerMoveId;
         this.winningStrategies = winningStrategies;
+        this.gameState = GameState.IN_PROGRESS;
     }
 
     public void makeMove() {
         Player currentPlayer = players.get(nextPlayerMoveId);
+        System.out.println("Current Player: " + currentPlayer.getName() + "(" + currentPlayer.getPlayerType() + ")");
         Move move = currentPlayer.makeMove(board);
-        System.out.println(currentPlayer.getName() + " wants to make a move at " + move.getCell().toString());
+        System.out.println("Cell chosen: " + move.getCell().toString());
 
         int row = move.getCell().getxPos();
         int col = move.getCell().getyPos();
@@ -44,6 +46,7 @@ public class Game {
 
         nextPlayerMoveId = (nextPlayerMoveId + 1) % players.size();
 
+        updateStrategyData(finalMove);
         if (checkWinner(finalMove)) {
             winner = currentPlayer;
             gameState = GameState.ENDED;
@@ -56,13 +59,46 @@ public class Game {
         board.printGrid();
     }
 
+    public void updateStrategyData(Move move) {
+        System.out.println("Updating data..");
+        for (WinningStrategy winningStrategy: winningStrategies) {
+            winningStrategy.handleNewMove(board, move);
+        }
+    }
+
     public boolean checkWinner(Move move) {
+        System.out.println("Checking winner..");
         for (WinningStrategy winningStrategy: winningStrategies) {
             if (winningStrategy.checkWinner(board, move)) {
                 return true;
             }
         }
         return false;
+    }
+
+    public void undo() throws InvalidUndoOperation {
+        if (moves.isEmpty()) {
+            throw new InvalidUndoOperation("Cannot perform undo on an empty board");
+        }
+
+        // Workaround: mark winner as null, revert game state to IN_PROGRESS
+        winner = null;
+        gameState = GameState.IN_PROGRESS;
+
+        // find last move
+        // update the cell as Empty
+        Move lastMove = moves.removeLast();
+        Cell cell = lastMove.getCell();
+        cell.setCellStatus(CellStatus.EMPTY);
+        cell.setPlayer(null);
+
+        // remove the symbol from the winning strategies
+        for (WinningStrategy winningStrategy: winningStrategies) {
+            winningStrategy.handleUndo(board, lastMove);
+        }
+
+        // move the chance back to same player
+        nextPlayerMoveId = (nextPlayerMoveId - 1 + players.size()) % players.size();
     }
 
     public static class Builder {
