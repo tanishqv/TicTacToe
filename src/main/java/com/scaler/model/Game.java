@@ -43,10 +43,26 @@ public class Game {
         moves.add(finalMove);
 
         nextPlayerMoveId = (nextPlayerMoveId + 1) % players.size();
+
+        if (checkWinner(finalMove)) {
+            winner = currentPlayer;
+            gameState = GameState.ENDED;
+        } else if (moves.size() == dimension * dimension) {
+            gameState = GameState.DRAW;
+        }
     }
 
     public void display() {
         board.printGrid();
+    }
+
+    public boolean checkWinner(Move move) {
+        for (WinningStrategy winningStrategy: winningStrategies) {
+            if (winningStrategy.checkWinner(board, move)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public static class Builder {
